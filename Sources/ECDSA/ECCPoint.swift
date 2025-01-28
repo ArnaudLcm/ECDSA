@@ -1,11 +1,32 @@
 import BigInt
+import Foundation
 
-public struct ECCPoint: Equatable {
+public struct ECCPoint: Equatable, Sendable {
   public var x: FiniteElement?
   public var y: FiniteElement?
 
   public var a: FiniteElement
   public var b: FiniteElement
+
+  private static func createFiniteElement(from value: BigInt?, prime: BigInt) throws
+    -> FiniteElement?
+  {
+    guard let value = value else { return nil }
+    return FiniteElement(value: value, prime: prime)
+  }
+
+  public init(a: BigInt, b: BigInt, p: BigInt, x: BigInt?, y: BigInt?) throws {
+    // Use the helper function to create FiniteElements from BigInt
+    let finiteA = FiniteElement(value: a, prime: p)
+    let finiteB = FiniteElement(value: b, prime: p)
+
+    // Handle the optional x and y values
+    let finiteX = try ECCPoint.createFiniteElement(from: x, prime: p)
+    let finiteY = try ECCPoint.createFiniteElement(from: y, prime: p)
+
+    // Initialize the point with the created FiniteElements
+    try self.init(a: finiteA, b: finiteB, x: finiteX, y: finiteY)
+  }
 
   public init(a: FiniteElement, b: FiniteElement, x: FiniteElement?, y: FiniteElement?) throws {
     if let x = x, let y = y {
@@ -34,7 +55,7 @@ public struct ECCPoint: Equatable {
       let y3 = try! slope * (lhs.x! - x3) - lhs.y!
       return try! ECCPoint(a: lhs.a, b: lhs.b, x: x3, y: y3)
     }
-    if lhs == rhs{  // Third case: We need to compute the tangent
+    if lhs == rhs {  // Third case: We need to compute the tangent
       let slope = try! (3 * (lhs.x! ^^ 2) + lhs.a) / (2 * lhs.y!)
       let x3 = try! (slope ^^ 2) - 2 * lhs.x!
       let y3 = try! slope * (lhs.x! - x3) - lhs.y!
@@ -48,7 +69,7 @@ public struct ECCPoint: Equatable {
     if rhs.x == nil { return rhs }  // Identity point, return immediately
     var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: rhs.x, y: rhs.y)
 
-    for _ in 0..<lhs-1 {
+    for _ in 0..<lhs - 1 {
       result = result + rhs
     }
 
@@ -57,7 +78,7 @@ public struct ECCPoint: Equatable {
   public static func * (lhs: ECCPoint, rhs: BigInt) -> ECCPoint {
     if lhs.x == nil { return lhs }
     var result = try! ECCPoint(a: lhs.a, b: lhs.b, x: lhs.x, y: lhs.y)
-    for _ in 0..<rhs-1 {
+    for _ in 0..<rhs - 1 {
 
       result = result + lhs
     }

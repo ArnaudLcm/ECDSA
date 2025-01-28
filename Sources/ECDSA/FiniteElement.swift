@@ -11,7 +11,7 @@ import BigInt
 
 infix operator ^^ : MultiplicationPrecedence
 
-public struct FiniteElement: Equatable {
+public struct FiniteElement: Equatable, Sendable {
 
   public var value: BigInt
   public var prime: BigInt

@@ -16,4 +16,4 @@ The goal of this project is to implement the elliptic curves digital signature a
 
 
 > [!WARNING]
-> This is a purely educational library. Use it at your own risk.
+> This is purely an educational library. Use it at your own risk.

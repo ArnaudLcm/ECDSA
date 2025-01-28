@@ -10,7 +10,7 @@ import Foundation
 
 infix operator ^^: MultiplicationPrecedence
 
-public struct FiniteElement {
+public struct FiniteElement: Equatable {
 
     public var value: Int64
     public var prime: Int64
@@ -42,6 +42,16 @@ public struct FiniteElement {
         return FiniteElement(value: (lhs.value * rhs.value) % lhs.prime, prime: lhs.prime)
     }
 
+
+    static func * (lhs: Int64, rhs: FiniteElement) throws -> FiniteElement {
+        return FiniteElement(value: (lhs * rhs.value) % rhs.prime, prime: rhs.prime)
+    }
+
+
+    static func * (lhs: FiniteElement, rhs: Int64) throws -> FiniteElement {
+        return FiniteElement(value: (rhs * lhs.value) % lhs.prime, prime: lhs.prime)
+    }
+
     static func ^^ (lhs: FiniteElement, exponent: Int) throws -> FiniteElement {
         var result: Int64 = 1
         var base = lhs.value
@@ -60,8 +70,10 @@ public struct FiniteElement {
 
     static func / (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
         try lhs.ensureSamePrime(rhs)
-        // Compute the modular inverse of rhs.value
+        
         let inverse = try rhs ^^ (Int(rhs.prime) - 2)
         return try lhs * inverse
     }
+    
+
 }

@@ -8,10 +8,16 @@ public struct ECDSAError: Error, Hashable {
     public static func invalidFiniteElement(_ context: String) -> ECDSAError {
         Self.init(content: .invalidFiniteElement(context: context))
     }
+
+
+    public static func invalidCurveDefinition(_ context: String) -> ECDSAError {
+        Self.init(content: .invalidCurveDefinition(context: context))
+    }
 }
 
 extension ECDSAError {
     enum Content: Hashable, Sendable {
         case invalidFiniteElement(context: String)
+        case invalidCurveDefinition(context: String)
     }
 }

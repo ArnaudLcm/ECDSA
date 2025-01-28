@@ -1,79 +1,85 @@
 import Foundation
 
 /**
-@def: A field set (K, +, *) is a group holding 1 set K and 2 closed laws (+, *) respecting the following properties:
+@def: A field set (K, +, *) is holding 1 set K and 2 closed laws (+, *) respecting the following properties:
     - A neutral element e exists such that for every x in the set, x * e = x
     - * has the multiplicative identity property: 1 exists and for every x in K, x * 1 = x
     - For every x in the set, x' exists such that x * x' = x' * x
     - If an element a exists in the set and 0 is not in the set, a^-1 is also in the set.
 **/
 
-infix operator ^^: MultiplicationPrecedence
+infix operator ^^ : MultiplicationPrecedence
 
 public struct FiniteElement: Equatable {
 
-    public var value: Int64
-    public var prime: Int64
+  public var value: Int
+  public var prime: Int
 
-    init(value: Int64, prime: Int64) {
-        // Ensure value is within the range [0, prime-1]
-        self.value = (value % prime + prime) % prime
-        self.prime = prime
+  init(value: Int, prime: Int) {
+    self.value = (value % prime + prime) % prime
+    self.prime = prime
+  }
+
+  private func ensureSamePrime(_ other: FiniteElement) throws {
+    guard self.prime == other.prime else {
+      throw ECDSAError.invalidFiniteElement(
+        "Cannot perform operation on FiniteElements with different primes: \(self.prime) != \(other.prime)"
+      )
+    }
+  }
+
+  static func + (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
+    try lhs.ensureSamePrime(rhs)
+    return FiniteElement(value: (lhs.value + rhs.value) % lhs.prime, prime: lhs.prime)
+  }
+
+  static func - (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
+    try lhs.ensureSamePrime(rhs)
+    return FiniteElement(value: (lhs.value - rhs.value) % lhs.prime, prime: lhs.prime)
+  }
+
+  static func * (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
+    try lhs.ensureSamePrime(rhs)
+    return FiniteElement(value: (lhs.value * rhs.value) % lhs.prime, prime: lhs.prime)
+  }
+
+  static func * (lhs: Int, rhs: FiniteElement) throws -> FiniteElement {
+    return FiniteElement(value: (lhs * rhs.value) % rhs.prime, prime: rhs.prime)
+  }
+
+  static func * (lhs: FiniteElement, rhs: Int) throws -> FiniteElement {
+    return FiniteElement(value: (rhs * lhs.value) % lhs.prime, prime: lhs.prime)
+  }
+
+  static func ^^ (lhs: FiniteElement, exponent: Int) throws -> FiniteElement {
+
+    var result: Int = 1
+    var base = lhs.value
+    var exp = exponent
+
+    // Handle negative exponents by computing the modular inverse
+    if exp < 0 {
+      exp = -exp
+      base = try (FiniteElement(value: base, prime: lhs.prime) ^^ (lhs.prime - 2)).value
     }
 
-    private func ensureSamePrime(_ other: FiniteElement) throws {
-        guard self.prime == other.prime else {
-            throw ECDSAError.invalidFiniteElement("Cannot perform operation on FiniteElements with different primes: \(self.prime) != \(other.prime)")
-        }
+    // Exponentiation by squaring
+    while exp > 0 {
+      if exp % 2 == 1 {
+        result = (result * base) % lhs.prime
+      }
+      base = (base * base) % lhs.prime
+      exp /= 2
     }
 
-    static func + (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
-        try lhs.ensureSamePrime(rhs)
-        return FiniteElement(value: (lhs.value + rhs.value) % lhs.prime, prime: lhs.prime)
-    }
+    return FiniteElement(value: result, prime: lhs.prime)
+  }
+  static func / (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
+    try lhs.ensureSamePrime(rhs)
 
-    static func - (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
-        try lhs.ensureSamePrime(rhs)
-        return FiniteElement(value: (lhs.value - rhs.value + lhs.prime) % lhs.prime, prime: lhs.prime)
-    }
-
-    static func * (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
-        try lhs.ensureSamePrime(rhs)
-        return FiniteElement(value: (lhs.value * rhs.value) % lhs.prime, prime: lhs.prime)
-    }
-
-
-    static func * (lhs: Int64, rhs: FiniteElement) throws -> FiniteElement {
-        return FiniteElement(value: (lhs * rhs.value) % rhs.prime, prime: rhs.prime)
-    }
-
-
-    static func * (lhs: FiniteElement, rhs: Int64) throws -> FiniteElement {
-        return FiniteElement(value: (rhs * lhs.value) % lhs.prime, prime: lhs.prime)
-    }
-
-    static func ^^ (lhs: FiniteElement, exponent: Int) throws -> FiniteElement {
-        var result: Int64 = 1
-        var base = lhs.value
-        var exp = exponent
-
-        while exp > 0 {
-            if exp % 2 == 1 {
-                result = (result * base) % lhs.prime
-            }
-            base = (base * base) % lhs.prime
-            exp /= 2
-        }
-
-        return FiniteElement(value: result, prime: lhs.prime)
-    }
-
-    static func / (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
-        try lhs.ensureSamePrime(rhs)
-        
-        let inverse = try rhs ^^ (Int(rhs.prime) - 2)
-        return try lhs * inverse
-    }
-    
+    let inverse = try rhs ^^ (Int(rhs.prime) - 2)
+    let res = try lhs * inverse
+    return FiniteElement(value: res.value % lhs.prime, prime: lhs.prime)
+  }
 
 }

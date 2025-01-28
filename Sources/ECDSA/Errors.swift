@@ -13,11 +13,16 @@ public struct ECDSAError: Error, Hashable {
     public static func invalidCurveDefinition(_ context: String) -> ECDSAError {
         Self.init(content: .invalidCurveDefinition(context: context))
     }
+
+    public static func invalidOperation(_ context: String) -> ECDSAError {
+        Self.init(content: .invalidOperation(context: context))
+    }
 }
 
 extension ECDSAError {
     enum Content: Hashable, Sendable {
         case invalidFiniteElement(context: String)
         case invalidCurveDefinition(context: String)
+        case invalidOperation(context: String)
     }
 }

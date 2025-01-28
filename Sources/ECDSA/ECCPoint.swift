@@ -33,8 +33,8 @@ public struct ECCPoint: Equatable {
       return try! ECCPoint(a: lhs.a, b: lhs.b, x: x3, y: y3)
     }
     if lhs.x == rhs.x && lhs.y == rhs.y {  // Third case: We need to compute the tangent
-      let slope = try! (3 * lhs.x! ^^ 2 + lhs.a) / (2 * lhs.y!)
-      let x3 = try! slope ^^ 2 - 2 * lhs.x!
+      let slope = try! (3 * (lhs.x! ^^ 2) + lhs.a) / (2 * lhs.y!)
+      let x3 = try! (slope ^^ 2) - 2 * lhs.x!
       let y3 = try! slope * (lhs.x! - x3) - lhs.y!
       return try! ECCPoint(a: lhs.a, b: lhs.b, x: x3, y: y3)
     }

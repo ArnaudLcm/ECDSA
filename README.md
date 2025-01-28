@@ -5,7 +5,7 @@
 
 <h4>
   
-  <span> · </span> <a href="https://github.com/ArnaudLcm/ECDSA/blob/main/Elliptic_Curves.pdf">Proof of relations in the algorithm</a>
+  <span> · </span> <a href="https://github.com/ArnaudLcm/ECDSA/blob/main/Elliptic_Curves.pdf">Proof of relations in the code</a>
    · 
 </h4>
 </div>

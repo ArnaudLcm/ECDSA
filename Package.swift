@@ -11,13 +11,15 @@ let package = Package(
       targets: ["ECDSA"])
   ],
   dependencies: [
-    .package(url: "https://github.com/attaswift/BigInt", from: "5.0.0")
+    .package(url: "https://github.com/attaswift/BigInt", from: "5.0.0"),
+    .package(url: "https://github.com/apple/swift-crypto.git", from: "2.0.0"),
   ],
   targets: [
     .target(
       name: "ECDSA",
       dependencies: [
-        .product(name: "BigInt", package: "BigInt")
+        .product(name: "BigInt", package: "BigInt"),
+        .product(name: "Crypto", package: "swift-crypto"),
       ]),
     .testTarget(
       name: "ECDSATests",

@@ -32,7 +32,7 @@ public struct ECCPoint: Equatable {
       let y3 = try! slope * (lhs.x! - x3) - lhs.y!
       return try! ECCPoint(a: lhs.a, b: lhs.b, x: x3, y: y3)
     }
-    if lhs.x == rhs.x && lhs.y == rhs.y {  // Third case: We need to compute the tangent
+    if lhs == rhs{  // Third case: We need to compute the tangent
       let slope = try! (3 * (lhs.x! ^^ 2) + lhs.a) / (2 * lhs.y!)
       let x3 = try! (slope ^^ 2) - 2 * lhs.x!
       let y3 = try! slope * (lhs.x! - x3) - lhs.y!
@@ -44,10 +44,9 @@ public struct ECCPoint: Equatable {
 
   public static func * (lhs: Int64, rhs: ECCPoint) -> ECCPoint {
     if rhs.x == nil { return rhs }  // Identity point, return immediately
+    var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: rhs.x, y: rhs.y)
 
-    var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: nil, y: nil)
-
-    for _ in 0..<lhs {
+    for _ in 0..<lhs-1 {
       result = result + rhs
     }
 

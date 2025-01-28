@@ -1,4 +1,5 @@
 import Foundation
+import BigInt
 
 /**
 @def: A field set (K, +, *) is holding 1 set K and 2 closed laws (+, *) respecting the following properties:
@@ -12,10 +13,10 @@ infix operator ^^ : MultiplicationPrecedence
 
 public struct FiniteElement: Equatable {
 
-  public var value: Int
-  public var prime: Int
+  public var value: BigInt
+  public var prime: BigInt
 
-  init(value: Int, prime: Int) {
+  init(value: BigInt, prime: BigInt) {
     self.value = (value % prime + prime) % prime
     self.prime = prime
   }
@@ -43,18 +44,18 @@ public struct FiniteElement: Equatable {
     return FiniteElement(value: (lhs.value * rhs.value) % lhs.prime, prime: lhs.prime)
   }
 
-  static func * (lhs: Int, rhs: FiniteElement) throws -> FiniteElement {
+  static func * (lhs: BigInt, rhs: FiniteElement) throws -> FiniteElement {
     return FiniteElement(value: (lhs * rhs.value) % rhs.prime, prime: rhs.prime)
   }
 
-  static func * (lhs: FiniteElement, rhs: Int) throws -> FiniteElement {
+  static func * (lhs: FiniteElement, rhs: BigInt) throws -> FiniteElement {
     return FiniteElement(value: (rhs * lhs.value) % lhs.prime, prime: lhs.prime)
   }
 
-  static func ^^ (lhs: FiniteElement, exponent: Int) throws -> FiniteElement {
+  static func ^^ (lhs: FiniteElement, exponent: BigInt) throws -> FiniteElement {
 
-    var result: Int = 1
-    var base = lhs.value
+    var result: BigInt = 1
+    var base: BigInt = lhs.value
     var exp = exponent
 
     // Handle negative exponents by computing the modular inverse
@@ -77,7 +78,7 @@ public struct FiniteElement: Equatable {
   static func / (lhs: FiniteElement, rhs: FiniteElement) throws -> FiniteElement {
     try lhs.ensureSamePrime(rhs)
 
-    let inverse = try rhs ^^ (Int(rhs.prime) - 2)
+    let inverse = try rhs ^^ (BigInt(rhs.prime) - BigInt(2))
     let res = try lhs * inverse
     return FiniteElement(value: res.value % lhs.prime, prime: lhs.prime)
   }

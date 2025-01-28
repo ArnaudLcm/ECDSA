@@ -1,4 +1,5 @@
 import XCTest
+import BigInt
 
 @testable import ECDSA
 
@@ -91,7 +92,7 @@ final class ECCPointTests: XCTestCase {
       a: a, b: b, x: FiniteElement(value: 192, prime: 223), y: FiniteElement(value: 105, prime: 223)
     )
 
-    let result = p * Int64(1)
+    let result = p * BigInt(1)
     XCTAssertEqual(result, p)
   }
 
@@ -105,7 +106,7 @@ final class ECCPointTests: XCTestCase {
     let expected = try ECCPoint(
       a: a, b: b, x: FiniteElement(value: 49, prime: 223), y: FiniteElement(value: 71, prime: 223))
 
-    let result = p * Int64(2)
+    let result = p * BigInt(2)
     XCTAssertEqual(result, expected)
   }
 

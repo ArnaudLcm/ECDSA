@@ -1,4 +1,5 @@
 import XCTest
+import BigInt
 @testable import ECDSA
 
 final class FiniteElementTests: XCTestCase {
@@ -61,7 +62,7 @@ final class FiniteElementTests: XCTestCase {
     // Test the inverse property
     func testInverse() throws {
         let a = FiniteElement(value: 5, prime: 11)
-        let inverse = try a ^^ (Int(a.prime) - 2)
+        let inverse = try a ^^ (BigInt(a.prime) - 2)
         let product = try a * inverse
         XCTAssertEqual(product.value, 1) // a * a^(-1) = 1
     }

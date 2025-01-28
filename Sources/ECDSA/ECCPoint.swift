@@ -1,3 +1,5 @@
+import BigInt
+
 public struct ECCPoint: Equatable {
   public var x: FiniteElement?
   public var y: FiniteElement?
@@ -42,7 +44,7 @@ public struct ECCPoint: Equatable {
     return lhs
   }
 
-  public static func * (lhs: Int64, rhs: ECCPoint) -> ECCPoint {
+  public static func * (lhs: BigInt, rhs: ECCPoint) -> ECCPoint {
     if rhs.x == nil { return rhs }  // Identity point, return immediately
     var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: rhs.x, y: rhs.y)
 
@@ -52,7 +54,7 @@ public struct ECCPoint: Equatable {
 
     return result
   }
-  public static func * (lhs: ECCPoint, rhs: Int64) -> ECCPoint {
+  public static func * (lhs: ECCPoint, rhs: BigInt) -> ECCPoint {
     if lhs.x == nil { return lhs }
     var result = try! ECCPoint(a: lhs.a, b: lhs.b, x: lhs.x, y: lhs.y)
     for _ in 0..<rhs-1 {

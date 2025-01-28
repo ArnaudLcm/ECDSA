@@ -4,21 +4,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "ECDSA",
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "ECDSA",
-            targets: ["ECDSA"]),
-    ],
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "ECDSA"),
-        .testTarget(
-            name: "ECDSATests",
-            dependencies: ["ECDSA"]
-        ),
-    ]
+  name: "ECDSA",
+  products: [
+    .library(
+      name: "ECDSA",
+      targets: ["ECDSA"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/attaswift/BigInt", from: "5.0.0")
+  ],
+  targets: [
+    .target(
+      name: "ECDSA",
+      dependencies: [
+        .product(name: "BigInt", package: "BigInt")
+      ]),
+    .testTarget(
+      name: "ECDSATests",
+      dependencies: ["ECDSA"]
+    ),
+  ]
 )

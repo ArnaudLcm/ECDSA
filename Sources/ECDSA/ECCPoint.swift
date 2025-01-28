@@ -1,7 +1,7 @@
 import BigInt
 import Foundation
 
-public struct ECCPoint: Equatable, Sendable {
+public struct ECCPoint: Equatable, Hashable {
   public var x: FiniteElement?
   public var y: FiniteElement?
 
@@ -39,6 +39,13 @@ public struct ECCPoint: Equatable, Sendable {
     self.y = y
     self.a = a
     self.b = b
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(x)
+    hasher.combine(y)
+    hasher.combine(a)
+    hasher.combine(b)
   }
 
   public static func + (lhs: ECCPoint, rhs: ECCPoint) -> ECCPoint {

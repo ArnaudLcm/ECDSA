@@ -1,5 +1,5 @@
-import Foundation
 import BigInt
+import Foundation
 
 /**
 @def: A field set (K, +, *) is holding 1 set K and 2 closed laws (+, *) respecting the following properties:
@@ -11,7 +11,7 @@ import BigInt
 
 infix operator ^^ : MultiplicationPrecedence
 
-public struct FiniteElement: Equatable, Sendable {
+public struct FiniteElement: Equatable, Hashable {
 
   public var value: BigInt
   public var prime: BigInt
@@ -19,6 +19,11 @@ public struct FiniteElement: Equatable, Sendable {
   init(value: BigInt, prime: BigInt) {
     self.value = (value % prime + prime) % prime
     self.prime = prime
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(value)
+    hasher.combine(prime)
   }
 
   private func ensureSamePrime(_ other: FiniteElement) throws {

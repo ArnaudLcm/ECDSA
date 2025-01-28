@@ -66,21 +66,42 @@ public struct ECCPoint: Equatable, Sendable {
   }
 
   public static func * (lhs: BigInt, rhs: ECCPoint) -> ECCPoint {
-    if rhs.x == nil { return rhs }  // Identity point, return immediately
-    var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: rhs.x, y: rhs.y)
+    if lhs == 0 || rhs.x == nil {
+      // Return the point at infinity
+      return try! ECCPoint(a: rhs.a, b: rhs.b, x: nil, y: nil)
+    }
 
-    for _ in 0..<lhs - 1 {
-      result = result + rhs
+    var result = try! ECCPoint(a: rhs.a, b: rhs.b, x: nil, y: nil)
+    var addend = rhs
+
+    var scalar = lhs
+    while scalar > 0 {
+      if scalar % 2 == 1 {
+        result = result + addend
+      }
+      addend = addend + addend
+      scalar /= 2
     }
 
     return result
   }
-  public static func * (lhs: ECCPoint, rhs: BigInt) -> ECCPoint {
-    if lhs.x == nil { return lhs }
-    var result = try! ECCPoint(a: lhs.a, b: lhs.b, x: lhs.x, y: lhs.y)
-    for _ in 0..<rhs - 1 {
 
-      result = result + lhs
+  public static func * (lhs: ECCPoint, rhs: BigInt) -> ECCPoint {
+    if rhs == 0 || lhs.x == nil {
+      // Return the point at infinity
+      return try! ECCPoint(a: lhs.a, b: lhs.b, x: nil, y: nil)
+    }
+
+    var result = try! ECCPoint(a: lhs.a, b: lhs.b, x: nil, y: nil)
+    var addend = lhs
+
+    var scalar = rhs
+    while scalar > 0 {
+      if scalar % 2 == 1 {
+        result = result + addend
+      }
+      addend = addend + addend
+      scalar /= 2
     }
 
     return result
